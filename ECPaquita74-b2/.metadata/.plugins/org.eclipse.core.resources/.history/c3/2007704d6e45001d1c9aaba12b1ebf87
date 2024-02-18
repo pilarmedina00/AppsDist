@@ -1,0 +1,40 @@
+package aadd.servlets;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import aadd.beans.Actividad;
+
+@WebServlet( name = "ServletGestionarCalendario", urlPatterns = "/calendario" )
+public class ServletGestionarCalendario extends HttpServlet {
+
+	private static final long serialVersionUID = 1L;
+
+	public ServletGestionarCalendario() {
+		super();
+	}
+	
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doPost(request,response);
+	}
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// Instanciamos el bean
+		Actividad c = new Actividad();
+		// Obtenemos los parámetros de la llamada
+		// No hace falta hacer conversiones de tipos porque todas las propiedades del
+		bean son cadenas de texto
+		c.setNombre(request.getParameter("nombre"));
+		c.setApellidos(request.getParameter("apellidos"));
+		c.setNif(request.getParameter("nif"));
+		c.setUsermail(request.getParameter("usermail"));
+		c.setUsername(request.getParameter("username"));
+		c.setPassword(request.getParameter("clave"));
+	}
+	
+}

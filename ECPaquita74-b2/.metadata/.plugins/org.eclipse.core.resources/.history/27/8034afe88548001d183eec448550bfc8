@@ -1,0 +1,78 @@
+package aadd.servlets;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import aadd.beans.Actividad;
+
+/**
+ * Servlet implementation class ServletReservar
+ */
+@WebServlet(name = "ServletReservar", urlPatterns = { "/ServletReservar", "/reservar" })
+public class ServletReservar extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	public ServletReservar() {
+		super();
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		response.setContentType("text/html");
+
+		PrintWriter out = response.getWriter();
+		// Obtenemos la ruta física al fichero del formulario
+
+		String pathFichero = getServletConfig().getServletContext().getRealPath("reserva.html");
+
+		BufferedReader br = new BufferedReader(new FileReader(pathFichero));
+
+		String linea;
+		while ((linea = br.readLine()) != null) {
+			out.println(linea);
+		}
+		br.close();
+
+		doPost(request, response);
+
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+				throws ServletException, IOException {
+
+		ServletContext app = getServletConfig().getServletContext();
+
+		// Establecemos el tipo MIME de la respuesta
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
+		
+		// Intenta localizar la tabla de actividades
+		HashMap<String, Actividad> actividadesHash = (HashMap<String, Actividad>)app.getAttribute("actividades");
+		if (request.getParameter("codigo") != null) {
+			if (actividadesHash != null){
+				HashMap<String, String> nombresActividades = new HashMap<String, String>();
+				for (Actividad actividad: actividadesHash.values()) {
+					if (actividad.getFecha().getMonthValue() == mes && actividad.getFecha().getYear() == anyo) {
+						nombresActividades.put(actividad.getIdActividad(), actividad.getNombre());
+					}
+				}
+			}	
+		}
+		else {
+			
+		}
+	}
+
+		
+}

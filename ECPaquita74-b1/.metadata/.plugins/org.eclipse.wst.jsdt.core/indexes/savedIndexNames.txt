@@ -1,0 +1,7 @@
+INDEX VERSION 1.4+C:\Users\Pilar\Desktop\Boletin1-AADD\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+1205537329.index
+2907903221.index
+783133671.index
+286166960.index
+3641005343.index
+1728882995.index

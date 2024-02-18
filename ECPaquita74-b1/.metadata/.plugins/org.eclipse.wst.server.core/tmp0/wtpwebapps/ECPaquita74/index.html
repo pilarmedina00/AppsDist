@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <h1>Gestionar calendario</h1>
+    </head>
+    <body>
+        <form method="POST" name="opciones" action="ServletGestionarCalendario"></formmethod>   
+          <fieldset>
+            <legend><h2><b><i>Escoge una opción</b></i></h2></legend>
+                <div>
+                    <label>Mes: </label> 
+                    <input type="number" name="mes" placeholder="mm" min="1" max="12" required>
+                </div>
+                <br>
+                <div>
+                    <label>Año: </label> 
+                    <input type="number" name="anyo" placeholder="yyyy" min="2000" required>
+                </div>
+                <br>
+                <input type="submit" value="Consultar actividades">
+                <br><br><br>
+                <a href="./registro.html">Registrar una actividad</a>
+            </fieldset>
+        </form>     
+    </body>
+</html>

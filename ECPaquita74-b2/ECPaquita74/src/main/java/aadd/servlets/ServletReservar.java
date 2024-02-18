@@ -1,0 +1,150 @@
+package aadd.servlets;
+
+import java.io.BufferedReader;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import aadd.beans.Actividad;
+import aadd.mongo.dao.ActividadCodecDAO;
+
+/**
+ * Servlet implementation class ServletReservar
+ */
+@WebServlet(name = "ServletReservar", urlPatterns = { "/ServletReservar", "/reservar" })
+public class ServletReservar extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	public ServletReservar() {
+		super();
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		response.setContentType("text/html");
+
+		PrintWriter out = response.getWriter();
+		// Obtenemos la ruta física al fichero del formulario
+
+		String pathFichero = getServletConfig().getServletContext().getRealPath("reserva.html");
+
+		BufferedReader br = new BufferedReader(new FileReader(pathFichero));
+
+		String linea;
+		while ((linea = br.readLine()) != null) {
+			out.println(linea);
+		}
+		br.close();
+
+		doPost(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		//ServletContext app = getServletConfig().getServletContext();
+
+		// Establecemos el tipo MIME de la respuesta
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
+
+		// Intenta localizar la tabla de actividades
+		//HashMap<String, Actividad> actividadesHash = (HashMap<String, Actividad>) app.getAttribute("actividades");
+		ActividadCodecDAO actividades = ActividadCodecDAO.getActividadCodecDAO();
+		actividades.createCollection();
+
+		// Se intenta obtener el mapa de reservas de la sesion http
+		HttpSession sesion = request.getSession(true);
+		@SuppressWarnings("unchecked")
+		HashMap<String, Actividad> reservas = (HashMap<String, Actividad>) sesion.getAttribute("reservas");
+		
+		// Si no hay reservas, se crea
+		if (reservas == null) {
+			reservas = new HashMap<String, Actividad>();
+			sesion.setAttribute("reservas", reservas);
+		}
+		
+		String codigo = request.getParameter("codigo");
+		if (codigo.equals("")) {
+			if (reservas.isEmpty()) {
+				String referer = request.getHeader("referer");
+				// Establece la cabecera de refresco
+				response.setHeader("refresh", "5; URL=" + referer);
+				
+				out.println("<html><head><h1>Reservas realizadas</h1></head><body>");
+				out.println("<h2>Aún no existen reservas</h2>");
+			} else {
+				for (Actividad actividad : reservas.values()) {
+					out.println("<html><head><h1>Reservas realizadas</h1></head><body>");
+					out.println("<b>Identificafor: " + actividad.getIdActividad() + "</b><br>Nombre: " + actividad.getNombre() + "<br><br>");					
+				}
+			}
+		} // Se ha introducido un codigo
+		else {
+			boolean encontrada = false;
+			List<Actividad> actividadesList = actividades.findActividades();
+
+			if (actividadesList != null) {
+				for (Actividad actividad : actividadesList) {
+					if (actividad.getIdActividad().equals(codigo)) {
+						encontrada = true;
+
+						if (actividad.getPlazas() > 0) {
+							// Se actualiza el numero de plazas disponibles
+							actividad.setPlazas(actividad.getPlazas() - 1);
+							actividades.updatePlazas(actividad);
+							// Se añade a la lista de reservas de la sesion hhtp
+							reservas.put(codigo, actividad);
+
+							out.println("<html><head><h1>Reserva en la actividad completada</h1></head><body>");
+							out.println("<h2>Has reservado una plaza en la actividad " + codigo + "</h2>");
+
+						} // Si no hay plazas disponibles
+						else {
+							String referer = request.getHeader("referer");
+							// Establece la cabecera de refresco
+							response.setHeader("refresh", "5; URL=" + referer);
+
+							out.println("<html><head><h1>Reserva en la actividad fallida</h1></head><body>");
+							out.println("<h2>No quedan plazas disponibles en la actividad " + codigo + "</h2>");
+						}
+						break;
+					}
+				} // Si no existe una actividad con ese codigo
+				if (!encontrada) {
+					// Obtiene la URL precedente
+					String referer = request.getHeader("referer");
+					// Establece la cabecera de refresco
+					response.setHeader("refresh", "5; URL=" + referer);
+
+					out.println("<html><head><h1>Reserva en la actividad fallida</h1></head><body>");
+					out.println("<h2>No existen actividades con el código " + codigo + "</h2>");
+					out.println("<h2>Prueba de nuevo en unos segundos.</h2>");
+				}
+			} // No hay aún actividades registradas
+			else {
+				String referer = request.getHeader("referer");
+				// Establece la cabecera de refresco
+				response.setHeader("refresh", "5; URL=" + referer);
+				
+				out.println("<html><head><h1>Reserva en la actividad fallida</h1></head><body>");
+				out.println("<h2>No hay actividades registradas en la aplicación</h2>");
+			}
+		}
+		// Cierre de la página
+		out.println("</body>");
+		out.println("</html>");
+	}
+
+}

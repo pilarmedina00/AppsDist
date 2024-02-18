@@ -1,0 +1,139 @@
+package aadd.servlets;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import aadd.beans.Actividad;
+
+/**
+ * Servlet implementation class ServletReservar
+ */
+@WebServlet(name = "ServletReservar", urlPatterns = { "/ServletReservar", "/reservar" })
+public class ServletReservar extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	public ServletReservar() {
+		super();
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		response.setContentType("text/html");
+
+		PrintWriter out = response.getWriter();
+		// Obtenemos la ruta física al fichero del formulario
+
+		String pathFichero = getServletConfig().getServletContext().getRealPath("reserva.html");
+
+		BufferedReader br = new BufferedReader(new FileReader(pathFichero));
+
+		String linea;
+		while ((linea = br.readLine()) != null) {
+			out.println(linea);
+		}
+		br.close();
+
+		doPost(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		ServletContext app = getServletConfig().getServletContext();
+
+		// Establecemos el tipo MIME de la respuesta
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
+
+		// Intenta localizar la tabla de actividades
+		HashMap<String, Actividad> actividadesHash = (HashMap<String, Actividad>) app.getAttribute("actividades");
+
+		// Se intenta obtener el mapa de reservas de la sesion http
+		HttpSession sesion = request.getSession(true);
+		HashMap<String, Actividad> reservas = (HashMap<String, Actividad>) sesion.getAttribute("reservas");
+
+		if (request.getParameter("codigo") != null) {
+			String codigo = request.getParameter("codigo");
+			boolean encontrada = false;
+
+			if (actividadesHash != null) {
+				for (Actividad actividad : actividadesHash.values()) {
+					if (actividad.getIdActividad().equals(codigo)) {
+						encontrada = true;
+
+						if (actividad.getPlazas() > 0) {
+							actividad.setPlazas(actividad.getPlazas() - 1);
+
+							// Si aun no hay reservas en la sesion, se crea
+							if (reservas == null) {
+								reservas = new HashMap<String, Actividad>();
+								sesion.setAttribute("reservas", reservas);
+							}
+							// Se añade a la lista de reservas de la sesion hhtp
+							reservas.put(codigo, actividad);
+
+							out.println("<html><head><h1>Reserva en la actividad completada</h1></head><body>");
+							out.println("<h2>Has reservado una plaza en la actividad " + codigo + "</h2>");
+
+						} // Si no hay plazas disponibles
+						else {
+							String referer = request.getHeader("referer");
+							// Establece la cabecera de refresco
+							response.setHeader("refresh", "5; URL=" + referer);
+
+							out.println("<html><head><h1>Reserva en la actividad fallida</h1></head><body>");
+							out.println("<h2>No quedan plazas disponibles en la actividad " + codigo + "</h2>");
+						}
+						break;
+					}
+				} // Si no existe una actividad con ese codigo
+				if (!encontrada) {
+					// Obtiene la URL precedente
+					String referer = request.getHeader("referer");
+					// Establece la cabecera de refresco
+					response.setHeader("refresh", "5; URL=" + referer);
+
+					out.println("<html><head><h1>Reserva en la actividad fallida</h1></head><body>");
+					out.println("<h2>No existen actividades con el código " + codigo + "</h2>");
+					out.println("<h2>Prueba de nuevo en unos segundos.</h2>");
+				}
+			} // No hay aún actividades registradas
+			else {
+				out.println("<html><head><h1>Reserva en la actividad fallida</h1></head><body>");
+				out.println("<h2>No hay actividades registradas en la aplicación</h2>");
+
+			}
+		} // No se ha introducido ningun codigo
+		else {
+
+			if (reservas == null) {
+				out.println("<html><head><h1>Reservas realizadas</h1></head><body>");
+				out.println("<h2>Aún no existen reservas</h2>");
+			} else {
+				for (Actividad actividad : reservas.values()) {
+					out.println("<html><head><h1>Reservas realizadas</h1></head><body>");
+					for (String id : reservas.keySet()) {
+						out.println("<b>" + id + "</b>, " + reservas.get(id).getNombre() + "<br><br>");
+					}
+				}
+			}
+		}
+
+		// Cierre de la página
+		out.println("</body>");
+		out.println("</html>");
+	}
+
+}

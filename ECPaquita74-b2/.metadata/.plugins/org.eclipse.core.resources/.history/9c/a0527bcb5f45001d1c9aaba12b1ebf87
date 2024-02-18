@@ -1,0 +1,5 @@
+package aadd.beans;
+
+public enum TipoActividad {
+
+}

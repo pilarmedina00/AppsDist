@@ -1,0 +1,17 @@
+package aadd.beans;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+public class Actividad {
+	
+	private String idActividad;
+	private LocalDate fecha;
+	private LocalTime hora;
+	private int plazas;
+	private String nombre;
+	private String descripcion;
+	private TipoActividad
+	
+
+}

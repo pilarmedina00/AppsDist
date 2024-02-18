@@ -1,0 +1,88 @@
+package aadd.servlets;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.HashMap;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import aadd.beans.Actividad;
+import aadd.beans.TipoActividad;
+
+@WebServlet(name = "ServletGestionarCalendario", urlPatterns = "/calendario")
+public class ServletGestionarCalendario extends HttpServlet {
+
+	private static final long serialVersionUID = 1L;
+	private HashMap<String, Actividad> actividades;
+
+	public ServletGestionarCalendario() {
+		super();
+	}
+	
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doPost(request,response);
+	}
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// Instanciamos el bean
+		Actividad actividad = new Actividad();
+		
+		// Obtenemos los parámetros de la llamada
+		actividad.setIdActividad(request.getParameter("idActividad"));
+		
+		// Establecemos el tipo MIME de la respuesta
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
+		
+		// Si no hay una actividad con ese código la guardamos con sus parámetros
+		if (!actividades.containsKey(actividad.getIdActividad())) {
+			
+			actividad.setFecha(LocalDate.parse(request.getParameter("fecha")));
+			actividad.setHora(LocalTime.parse(request.getParameter("hora")));
+			actividad.setPlazas(Integer.parseInt(request.getParameter("plazas")));
+			actividad.setNombre(request.getParameter("nombre"));
+			actividad.setDescripcion(request.getParameter("descripcion"));
+			
+			switch(request.getParameter("tipoActividad")) {
+				case "artesania":
+					actividad.setTipoActividad(TipoActividad.ARTESANIA);
+					break;
+				case "cine":
+					actividad.setTipoActividad(TipoActividad.CINE);
+					break;
+				case "fotografia":
+					actividad.setTipoActividad(TipoActividad.FOTOGRAFIA);
+					break;
+				case "mindandbody":
+					actividad.setTipoActividad(TipoActividad.MINDANDBODY);
+					break;
+			}
+			
+			actividades.put(actividad.getIdActividad(), actividad);
+			
+			out.println("<html> <head> <title> Login </title> </head> <body>");
+			out.println("<B><P>La actividad se ha registrado correctamente.</B></P>");
+			
+		}
+		//Si ya hay una actividad con ese código, que ha de ser único
+		else {
+			
+			out.println("<html> <head> <title> Login </title> </head> <body>");
+			out.println("<B><P>Ya existe una actividad con ese código.</B></P>");
+			
+		}
+		// Cierre de la página
+		out.println("</body>");
+		out.println("</html>");
+		
+		
+
+	}
+	
+}

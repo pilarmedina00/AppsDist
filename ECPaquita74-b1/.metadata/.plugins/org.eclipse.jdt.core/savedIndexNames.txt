@@ -1,0 +1,5 @@
+INDEX VERSION 1.131+C:\Users\Pilar\Desktop\Boletin1-AADD\.metadata\.plugins\org.eclipse.jdt.core
+3217113963.index
+1728882995.index
+1865797976.index
+3554652105.index

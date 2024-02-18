@@ -1,0 +1,6 @@
+127.0.0.1 - - [09/Oct/2022:22:40:20 +0200] "GET / HTTP/1.1" 404 687
+0:0:0:0:0:0:0:1 - - [09/Oct/2022:22:40:20 +0200] "GET /ECPaquita74/ServletGestionarCalendario HTTP/1.1" 500 914
+0:0:0:0:0:0:0:1 - - [09/Oct/2022:22:40:24 +0200] "POST /ECPaquita74/ServletGestionarCalendario HTTP/1.1" 500 102
+0:0:0:0:0:0:0:1 - - [09/Oct/2022:22:40:31 +0200] "GET /ECPaquita74/ServletGestionarCalendario HTTP/1.1" 500 914
+0:0:0:0:0:0:0:1 - - [09/Oct/2022:22:40:40 +0200] "POST /ECPaquita74/ServletGestionarCalendario HTTP/1.1" 500 102
+0:0:0:0:0:0:0:1 - - [09/Oct/2022:22:40:43 +0200] "GET /ECPaquita74/ServletGestionarCalendario HTTP/1.1" 500 914
