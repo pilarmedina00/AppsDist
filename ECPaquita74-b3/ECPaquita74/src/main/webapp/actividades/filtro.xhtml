@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/WEB-INF/template/basicTemplate.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+	<ui:define name="title">Buscar por id</ui:define>
+	<ui:define name="content">
+		<h:head>
+		</h:head>
+		<h:body>
+			<h1>Buscar por id</h1>
+			<h:messages id="errors" infoStyle="color:white"
+				warnStyle="color:grey" errorStyle="color:black" showDetail="true" />
+			<h:form>
+				<h:panelGrid columns="2">
+					<h:outputText value="Identificador: " />
+					<p:inputText value="#{actividadRespaldo.idFiltro}" required="true" />
+				</h:panelGrid>
+				<p:commandButton value="Buscar"
+					actionListener="#{actividadRespaldo.buscar()}"
+					update="filtros">
+				</p:commandButton>
+			</h:form>
+			<hr />
+			<h2>Actividades encontradas</h2>
+			<h:dataTable id="filtros"
+				value="#{actividadRespaldo.filtrada}" var="act" border="1">
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Identificador" />
+					</f:facet>
+					<h:outputText value="#{act.idActividad}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Nombre" />
+					</f:facet>
+					<h:outputText value="#{act.nombre}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Descripción" />
+					</f:facet>
+					<h:outputText value="#{act.descripcion}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Fecha" />
+					</f:facet>
+					<h:outputText value="#{act.fecha}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Hora" />
+					</f:facet>
+					<h:outputText value="#{act.hora}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Plazas disponibles" />
+					</f:facet>
+					<h:outputText value="#{act.plazas}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Tipo" />
+					</f:facet>
+					<h:outputText value="#{act.tipoActividad}" />
+				</h:column>
+			</h:dataTable>
+		</h:body>
+	</ui:define>
+</ui:composition>
